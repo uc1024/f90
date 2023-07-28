@@ -49,20 +49,19 @@ type SetClaimsOption func(jwt.MapClaims)
 
 func NewAuthorizeClaims(opts ...SetClaimsOption) jwt.MapClaims {
 	ac := jwt.MapClaims{
-			jwtAudience:  []string{},
-			jwtId:        "",
-			jwtIssuer:    defaultJwtIssuer,
-			jwtExpire:    time.Now().Add(defaultExpireDuration).Unix(),
-			jwtIssueAt:   time.Now().Unix(),
-			jwtNotBefore: time.Now().Unix(),
-		}
-	
+		jwtAudience:  []string{},
+		jwtId:        "",
+		jwtIssuer:    defaultJwtIssuer,
+		jwtExpire:    time.Now().Add(defaultExpireDuration).Unix(),
+		jwtIssueAt:   time.Now().Unix(),
+		jwtNotBefore: time.Now().Unix(),
+	}
+
 	for _, opt := range opts {
 		opt(ac)
 	}
 	return ac
 }
-
 
 // SetExp 设置过期时间
 func SetExp(t time.Time) SetClaimsOption {
@@ -72,11 +71,11 @@ func SetExp(t time.Time) SetClaimsOption {
 }
 
 /*
-	SetAUT 设置受众 在实际应用中，如果要设置"Audience"声明的默认值，
-	可以根据应用的需求和设计选择适当的值。例如，如果JWT用于身份验证服务，
-	可能将默认受众设置为该服务的标识符或URL。如果JWT用于特定的用户或角色，
-	可以将默认受众设置为该用户或角色的标识符。
-	默认值应根据具体场景和需求进行定义，并在代码中相应地设置。
+SetAUT 设置受众 在实际应用中，如果要设置"Audience"声明的默认值，
+可以根据应用的需求和设计选择适当的值。例如，如果JWT用于身份验证服务，
+可能将默认受众设置为该服务的标识符或URL。如果JWT用于特定的用户或角色，
+可以将默认受众设置为该用户或角色的标识符。
+默认值应根据具体场景和需求进行定义，并在代码中相应地设置。
 */
 func SetAud(aud []string) SetClaimsOption {
 	return func(ac jwt.MapClaims) {
@@ -85,8 +84,8 @@ func SetAud(aud []string) SetClaimsOption {
 }
 
 /*
-	SetJti 设置JWT ID
-	JWT ID是一个字符串值，用于唯一标识JWT。它的作用是确保每个JWT都具有唯一的标识符，以防止重放攻击或重复使用JWT。通常，JWT ID的生成应遵循一定的规则和算法，以确保其全局唯一性。
+SetJti 设置JWT ID
+JWT ID是一个字符串值，用于唯一标识JWT。它的作用是确保每个JWT都具有唯一的标识符，以防止重放攻击或重复使用JWT。通常，JWT ID的生成应遵循一定的规则和算法，以确保其全局唯一性。
 */
 func SetJti(jti string) SetClaimsOption {
 	return func(ac jwt.MapClaims) {
@@ -102,9 +101,9 @@ func SetIat(t time.Time) SetClaimsOption {
 }
 
 /*
-	SetNbf 设置不可用之前时间
-	"nbf"声明用于指定JWT的生效时间，即在此时间之前JWT不应被接受或使用。
-	它表示JWT的开始生效时间，即在此时间之前，JWT被视为无效或不可用。
+SetNbf 设置不可用之前时间
+"nbf"声明用于指定JWT的生效时间，即在此时间之前JWT不应被接受或使用。
+它表示JWT的开始生效时间，即在此时间之前，JWT被视为无效或不可用。
 */
 func SetNbf(t time.Time) SetClaimsOption {
 	return func(ac jwt.MapClaims) {
@@ -118,6 +117,3 @@ func SetIss(iss string) SetClaimsOption {
 		ac[jwtIssuer] = iss
 	}
 }
-
-
-
