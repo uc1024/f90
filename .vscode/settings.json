@@ -1,0 +1,65 @@
+{
+    "go.testFlags": ["-count=1"], // 禁止 go test 缓存
+    "commentTranslate.targetLanguage": "zh-CN",
+    "gopls": {
+        "analyses": {
+            "composites": false
+        }
+    },
+    "protoc": {
+        "path": "/home/linuxbrew/.linuxbrew/bin/protoc",
+        "options": [
+            "--proto_path=${workspaceFolder}/.build/proto",
+            "--proto_path=${workspaceFolder}"
+        ]
+    },
+    "clang-format.executable": "/bin/clang-format",
+    "vim.insertModeKeyBindings": [
+        {
+            "before": [
+                "j",
+                "j"
+            ],
+            "after": [
+                "<Esc>"
+            ]
+        },
+        {
+            "before": [
+                "<Up>"
+            ],
+            "after": [
+                "<Nop>"
+            ]
+        },
+        {
+            "before": [
+                "<Down>"
+            ],
+            "after": [
+                "<Nop>"
+            ]
+        },
+        {
+            "before": [
+                "<Left>"
+            ],
+            "after": [
+                "<Nop>"
+            ]
+        },
+        {
+            "before": [
+                "<Right>"
+            ],
+            "after": [
+                "<Nop>"
+            ]
+        }
+    ],
+    "todo-tree.tree.scanMode": "workspace only",
+    "diffEditor.wordWrap": "on",
+    "zenMode.hideStatusBar": false,
+    "workbench.statusBar.visible": true,
+    "editor.suggest.showStatusBar": true
+}
