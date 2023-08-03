@@ -103,3 +103,25 @@ func (e TokenExtractor) ExtractRequest(r *http.Request) (string, error) {
 	}
 	return token_header, nil
 }
+
+type JwtUserIdExtractor struct{}
+
+func (e JwtUserIdExtractor) Extract(ctx context.Context) (string, error) {
+	token := ctx.Value(jwtUserId)
+	token_header, ok := token.(string)
+	if !ok {
+		return "", ErrInvalidTokenType
+	}
+	if token_header == "" {
+		return "", ErrNoTokenInContext
+	}
+	return token_header, nil
+}
+
+func (e JwtUserIdExtractor) ExtractRequest(r *http.Request) (string, error) {
+	token_header := r.Header.Get(jwtUserId)
+	if token_header == "" {
+		return "", ErrNoTokenInContext
+	}
+	return token_header, nil
+}
