@@ -15,7 +15,7 @@ type (
 )
 
 /*
-	add node
+add node
 */
 func (n *node) add(word string) {
 
@@ -113,7 +113,7 @@ func (n *node) find(chars []rune, skip ...rune) []scope {
 
 	for i := 0; i < size; i++ {
 		// * 过滤
-		if slices.Contains[rune](skip, chars[i]) {
+		if slices.Contains(skip, chars[i]) {
 			offset++
 			continue
 		}
