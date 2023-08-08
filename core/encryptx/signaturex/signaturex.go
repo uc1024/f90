@@ -27,6 +27,10 @@ const (
 	HMAC_SHA256_SECRET = "hmac-sha256-secret"
 )
 
+var (
+	ErrorSgin = errors.New("sign error")
+)
+
 // hmac-sha256-secret
 type SignatureHmacSha256Secret struct {
 	secret string
@@ -78,7 +82,9 @@ func (sign SignatureHmacSha256Secret) ChckeMap(m map[string]string, inKeys []str
 	return result, nil
 }
 
+// 根据请求生成签名
 func (sign SignatureHmacSha256Secret) SigntureRequest(request *http.Request) (signStr string, err error) {
+
 	// head info
 	inKeys := []string{
 		APP_ID,
@@ -107,21 +113,22 @@ func (sign SignatureHmacSha256Secret) SigntureRequest(request *http.Request) (si
 
 	// * 签名验证
 	h := strings.Builder{}
-	h.Write([]byte(head["AppId"]))
-	h.Write([]byte(head["UnixMilli"]))
+	h.Write([]byte(head[APP_ID]))
+	h.Write([]byte(head[UnixMilli]))
 	h.Write([]byte(strings.ToUpper(request.Method)))
 	h.Write([]byte(body))
 	h.Write([]byte(request.URL.RequestURI()))
 	return sign.Signature([]byte(h.String())), nil
 }
 
+// 签名 
 func (sign SignatureHmacSha256Secret) Signature(buf []byte) string {
 	h := hmac.New(sha256.New, []byte(sign.secret))
 	h.Write(buf)
 	return base64.StdEncoding.EncodeToString(h.Sum(nil))
 }
 
-// 签名验证
+// 校验请求签名验证
 func (sign SignatureHmacSha256Secret) SigntureChckeRequest(request *http.Request) (err error) {
 	// head info
 	inKeys := []string{
@@ -167,7 +174,7 @@ func (sign SignatureHmacSha256Secret) SigntureChckeRequest(request *http.Request
 	h.Write([]byte(request.URL.RequestURI()))
 	signature := sign.Signature([]byte(h.String()))
 	if signature != head[Sign] {
-		return errors.New("sign error")
+		return ErrorSgin
 	}
 	return nil
 }
