@@ -3,6 +3,7 @@ package rsax
 import (
 	_ "embed"
 	"encoding/hex"
+	"net/url"
 	"strings"
 	"testing"
 
@@ -24,7 +25,6 @@ var t_map = map[string]string{
 }
 
 func TestMapSortToVal(t *testing.T) {
-
 	t.Log(MapSortToVal[string](t_map))
 }
 
@@ -53,7 +53,28 @@ MQIDAQAB
 -----END Public key-----
 `)
 	assert.NotEqual(t, err, nil)
-	
-	err = VerifySignMd5WithRsa(data,sign_data,public_key)
+
+	err = VerifySignMd5WithRsa(data, sign_data, public_key)
 	assert.Equal(t, err, nil)
+}
+
+func TestKeyEncodeDecode(t *testing.T) {
+	urlValues := url.Values{}
+	urlValues.Add("X", "5")
+	urlValues.Add("C", "3")
+	data := urlValues.Encode()
+	pr := New(SetPublicString(public_key),
+		SetPrivateString(private_key))
+
+	result, err := pr.PubKeyEncode([]byte(data))
+	assert.Equal(t, err, nil)
+	resultDecode, err := pr.PriKeyDecode(result)
+	assert.Equal(t, err, nil)
+	assert.Equal(t, data, string(resultDecode))
+
+	result, err = pr.PriKeyEncode([]byte(data))
+	assert.Equal(t, err, nil)
+	resultDecode, err = pr.PubKeyDecode(result)
+	assert.Equal(t, err, nil)
+	assert.Equal(t, data, string(resultDecode))
 }

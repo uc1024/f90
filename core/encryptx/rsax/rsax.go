@@ -20,7 +20,7 @@ type (
 		priStr string // * 私钥字符串
 	}
 
-	RSAXSecurityOptions func(*rsaxSecurityoptions)
+	rsaxSecurityOptions func(*rsaxSecurityoptions)
 
 	RSAXSecurity struct {
 		options rsaxSecurityoptions
@@ -29,19 +29,19 @@ type (
 	}
 )
 
-func SetPublicString(val string) RSAXSecurityOptions {
+func SetPublicString(val string) rsaxSecurityOptions {
 	return func(o *rsaxSecurityoptions) {
 		o.pubStr = val
 	}
 }
 
-func SetPrivateString(val string) RSAXSecurityOptions {
+func SetPrivateString(val string) rsaxSecurityOptions {
 	return func(o *rsaxSecurityoptions) {
 		o.priStr = val
 	}
 }
 
-func New(opts ...RSAXSecurityOptions) *RSAXSecurity {
+func New(opts ...rsaxSecurityOptions) *RSAXSecurity {
 
 	options := &rsaxSecurityoptions{}
 

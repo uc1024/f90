@@ -3,8 +3,6 @@ package timex
 import (
 	"errors"
 	"time"
-
-	"github.com/spf13/cast"
 )
 
 const (
@@ -25,13 +23,15 @@ func Uint64TimeFormat(u uint64) string {
 	return time.Unix(int64(u), 0).Format(TimeLayout)
 }
 
-// * 是否在当前时间区间
-func CurrentTimeOut(unix int64, offset time.Duration) error {
-	// * 时间区间
-	rt := time.Unix(cast.ToInt64(unix), 0).Unix()
-	ex := time.Unix(cast.ToInt64(unix), 0).Add(offset).Unix()
-	now := time.Now().Unix()
-	if !(now <= ex && now >= rt) {
+// IsCurrentTimeWithinInterval checks if the current time falls within the interval defined by the given Unix timestamp and offset.
+func IsCurrentTimeWithinInterval(unixTimestamp int64, offset time.Duration) error {
+	// Calculate the start and end times of the interval in milliseconds
+	intervalStart := time.UnixMilli(unixTimestamp).UnixMilli()
+	intervalEnd := time.UnixMilli(unixTimestamp).Add(offset).UnixMilli()
+	currentTime := time.Now().UnixMilli()
+
+	// Check if the current time falls outside the interval
+	if !(currentTime <= intervalEnd && currentTime >= intervalStart) {
 		return errors.New("time out")
 	}
 	return nil
