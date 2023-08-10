@@ -4,9 +4,7 @@ import (
 	"bytes"
 	"net/http"
 	"testing"
-	"time"
 
-	"github.com/spf13/cast"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -20,11 +18,9 @@ func TestSignatureHmacSha256Secret_SigntureChckeRequest(t *testing.T) {
 
 	// Set the required headers
 	req.Header.Set("AppId", "test-app-id")
-	req.Header.Set("UnixMilli", cast.ToString(time.Now().UnixMilli()))
-	s, err := sign.SigntureRequest(req)
+	_, err = sign.SigntureRequest(req)
 	assert.NoError(t, err)
-	req.Header.Set("Sign", s)
-
+	
 	// Call the SigntureChckeRequest method
 	err = sign.SigntureChckeRequest(req)
 	assert.NoError(t, err)
