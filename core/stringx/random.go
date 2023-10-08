@@ -9,12 +9,12 @@ import (
 )
 
 const (
-	letterBytes    = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-	letterIdxBits  = 6 // 6 bits to represent a letter index
-	idLen          = 8
-	defaultRandLen = 8
-	letterIdxMask  = 1<<letterIdxBits - 1 // All 1-bits, as many as letterIdxBits
-	letterIdxMax   = 63 / letterIdxBits   // # of letter indices fitting in 63 bits
+	defultLetterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	letterIdxBits     = 6 // 6 bits to represent a letter index
+	idLen             = 8
+	defaultRandLen    = 8
+	letterIdxMask     = 1<<letterIdxBits - 1 // All 1-bits, as many as letterIdxBits
+	letterIdxMax      = 63 / letterIdxBits   // # of letter indices fitting in 63 bits
 )
 
 var src = newLockedSource(time.Now().UnixNano())
@@ -44,7 +44,7 @@ func (ls *lockedSource) Seed(seed int64) {
 
 // Rand returns a random string.
 func Rand() string {
-	return Randn(defaultRandLen)
+	return Randn(defaultRandLen,"")
 }
 
 // RandId returns a random id string.
@@ -52,14 +52,17 @@ func RandId() string {
 	b := make([]byte, idLen)
 	_, err := crand.Read(b)
 	if err != nil {
-		return Randn(idLen)
+		return Randn(idLen, "")
 	}
 
 	return fmt.Sprintf("%x%x%x%x", b[0:2], b[2:4], b[4:6], b[6:8])
 }
 
 // Randn returns a random string with length n.
-func Randn(n int) string {
+func Randn(n int, letterBytes string) string {
+	if letterBytes == "" {
+		letterBytes = defultLetterBytes
+	}
 	b := make([]byte, n)
 	// A src.Int63() generates 63 random bits, enough for letterIdxMax characters!
 	for i, cache, remain := n-1, src.Int63(), letterIdxMax; i >= 0; {

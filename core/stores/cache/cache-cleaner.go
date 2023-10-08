@@ -38,7 +38,7 @@ func init() {
 }
 
 func AddCleanTask(task func() error, keys ...string) {
-	timingWheel.SetTimer(stringx.Randn(8), cacheCleaner{
+	timingWheel.SetTimer(stringx.Randn(8, ""), cacheCleaner{
 		delay: time.Second,
 		task:  task,
 		keys:  keys,

@@ -13,11 +13,11 @@ func TestRand(t *testing.T) {
 	assert.True(t, len(RandId()) > 0)
 
 	const size = 10
-	assert.True(t, len(Randn(size)) == size)
+	assert.True(t, len(Randn(size, "")) == size)
 }
 
 func BenchmarkRandString(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_ = Randn(10)
+		b.Log(Randn(10, ""))
 	}
 }
