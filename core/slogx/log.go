@@ -3,6 +3,7 @@ package slogx
 import (
 	"context"
 	"fmt"
+	"io"
 	"os"
 	"runtime"
 
@@ -35,6 +36,8 @@ type Writer interface {
 // Interface logger interface
 type LogInterface interface {
 	LogMode(LogLevel) LogInterface
+	SetWriter(io.Writer) LogInterface
+
 	Info(context.Context, string, ...interface{})
 	Infof(context.Context, string, ...interface{})
 	// Infof(context.Context, string, ...interface{})
@@ -60,6 +63,11 @@ func (s *SlogLogger) LogMode(level LogLevel) LogInterface {
 	new_logger := *s
 	new_logger.LogLevel = level
 	return &new_logger
+}
+
+func (s *SlogLogger) SetWriter(iw io.Writer) LogInterface {
+	s.Writer = newLoggerWithJson(iw)
+	return s
 }
 
 /*
@@ -147,7 +155,7 @@ type logWriter struct {
 	*slog.Logger
 }
 
-func newLoggerWithJson(std *os.File) Writer {
+func newLoggerWithJson(std io.Writer) Writer {
 	lw := &logWriter{}
 	handler := slog.NewJSONHandler(std, &slog.HandlerOptions{})
 	lw.Logger = slog.New(handler)
