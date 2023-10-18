@@ -7,7 +7,6 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"io"
-	"io/ioutil"
 )
 
 func getPKPubKey(pub []byte) (pub_rsa *rsa.PublicKey, err error) {
@@ -43,7 +42,7 @@ func pubKeyByte(pub *rsa.PublicKey, in []byte, isEncrytp bool) ([]byte, error) {
 		if err := pubKeyIO(pub, bytes.NewReader(in), out, isEncrytp); err != nil {
 			return nil, err
 		}
-		return ioutil.ReadAll(out)
+		return io.ReadAll(out)
 	}
 }
 

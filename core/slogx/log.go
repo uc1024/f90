@@ -149,20 +149,7 @@ type logWriter struct {
 
 func newLoggerWithJson(std *os.File) Writer {
 	lw := &logWriter{}
-	handler := slog.NewJSONHandler(std, &slog.HandlerOptions{
-		// AddSource: true,
-		/*
-			is echo runtime pc
-			AddSource: false
-		*/
-		// * modify key value
-		// ReplaceAttr: func(groups []string, a slog.Attr) slog.Attr {
-		// 	if a.Key == "time" {
-		// 		return slog.Attr{Key: "ts", Value: a.Value}
-		// 	}
-		// 	return a
-		// },
-	})
+	handler := slog.NewJSONHandler(std, &slog.HandlerOptions{})
 	lw.Logger = slog.New(handler)
 	return lw
 }

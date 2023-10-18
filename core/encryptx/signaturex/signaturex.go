@@ -84,23 +84,18 @@ func (sign SignatureHmacSha256Secret) ChckeMap(m map[string]string, inKeys []str
 
 // 根据请求生成签名
 func (sign SignatureHmacSha256Secret) SigntureRequest(request *http.Request) (signStr string, err error) {
-
 	ux := time.Now().UnixMilli()
 	request.Header.Set(UnixMilli, cast.ToString(ux))
-
 	// head info
 	inKeys := []string{
 		APP_ID,
 		UnixMilli,
 	}
-
 	head, err := sign.ChckeHead(&request.Header, inKeys)
 	if err != nil {
 		return "", err
 	}
-
 	var body string
-
 	// * 如果请求存在body
 	if request.Body != nil &&
 		request.Method != http.MethodGet &&
@@ -115,7 +110,6 @@ func (sign SignatureHmacSha256Secret) SigntureRequest(request *http.Request) (si
 			body = *(*string)(unsafe.Pointer(&origBody))
 		}
 	}
-
 	// * 签名验证
 	h := strings.Builder{}
 	h.Write([]byte(head[APP_ID]))
@@ -148,15 +142,12 @@ func (sign SignatureHmacSha256Secret) SigntureChckeRequest(request *http.Request
 		return err
 	}
 	_ = head
-
 	// * 超时
 	err = sign.isTimeOut(cast.ToInt64(head[UnixMilli]))
 	if err != nil {
 		return err
 	}
-
 	var body string
-
 	// * 如果请求存在body
 	if request.Body != nil &&
 		request.Method != http.MethodGet &&
@@ -171,7 +162,6 @@ func (sign SignatureHmacSha256Secret) SigntureChckeRequest(request *http.Request
 			body = *(*string)(unsafe.Pointer(&origBody))
 		}
 	}
-
 	// * 签名验证
 	h := strings.Builder{}
 	h.Write([]byte(head[APP_ID]))

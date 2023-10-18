@@ -8,7 +8,6 @@ import (
 	"encoding/pem"
 	"errors"
 	"io"
-	"io/ioutil"
 )
 
 func getPKPrivkey(priv []byte) (priv_key *rsa.PrivateKey, err error) {
@@ -52,7 +51,7 @@ func priKeyByte(pri *rsa.PrivateKey, in []byte, isEncrytp bool) ([]byte, error) 
 		if err := priKeyIO(pri, bytes.NewReader(in), out, isEncrytp); err != nil {
 			return nil, err
 		}
-		return ioutil.ReadAll(out)
+		return io.ReadAll(out)
 	}
 }
 
