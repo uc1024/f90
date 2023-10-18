@@ -6,6 +6,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/uc1024/f90/core/proc"
 	"github.com/uc1024/f90/core/syncx"
 	"github.com/uc1024/f90/core/threadingx"
 	"github.com/uc1024/f90/core/timex"
@@ -51,10 +52,10 @@ func NewPeriodicalExecutor(interval time.Duration, container TaskContainer) *Per
 			return timex.NewTicker(d) // 创建一个新的定时器
 		},
 	}
-	// TODO 安全关闭
-	// proc.AddShutdownListener(func() {
-	// 	executor.Flush() // 在程序关闭时执行 Flush()
-	// })
+
+	proc.AddShutdownListener(func() {
+		executor.Flush() // 在程序关闭时执行 Flush()
+	})
 
 	return executor
 }
