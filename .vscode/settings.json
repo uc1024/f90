@@ -1,5 +1,7 @@
 {
-    "go.testFlags": ["-count=1"], // 禁止 go test 缓存
+    "go.testFlags": [
+        "-count=1"
+    ], // 禁止 go test 缓存 
     "commentTranslate.targetLanguage": "zh-CN",
     "gopls": {
         "analyses": {

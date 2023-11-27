@@ -26,7 +26,7 @@ func TestQueue(t *testing.T) {
 	q.AddListener(new(mockedListener))
 	q.SetName("mockqueue")
 	q.SetConsumerQuantity(consumers)
-	q.SetConsumerQuantity(1)
+	q.SetProducerQuantity(1)
 	q.pause()
 	q.resume()
 	go func() {

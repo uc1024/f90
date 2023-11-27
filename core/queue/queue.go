@@ -26,11 +26,11 @@ type (
 		producerQuantity     int
 		consumerQuentity     int
 		active               int32
-		channel              chan string
+		channel              chan string // 消费管道
 		quit                 chan struct{}
-		listeners            []Listener // * 队列事件监听器
-		eventLock            sync.Mutex // * 事件管道锁,在操作事件管道时需要加锁
-		eventChannels        []chan any
+		listeners            []Listener //  队列事件监听器
+		eventLock            sync.Mutex //  事件管道锁,在操作事件管道时需要加锁
+		eventChannels        []chan any //  事件管道
 	}
 )
 
@@ -59,8 +59,11 @@ func (q *Queue) Start() {
 	q.startProducers(q.producerQuantity)
 	q.startConsumers(q.consumerQuentity)
 
+	// 等待所有生产者线程完成
 	q.producerRoutineGroup.Wait()
+	// 关闭通道，停止所有发送操作
 	close(q.channel)
+	// 等待所有消费者线程完成
 	q.consumerRoutineGroup.Wait()
 }
 
@@ -120,19 +123,19 @@ func (q *Queue) produce() {
 			break
 		}
 	}
-	// * 活动实例++
+	//  活动实例++
 	atomic.AddInt32(&q.active, 1)
-	// * 添加监听器
+	//  添加监听器
 	producer.AddListener(routineListener{
 		queue: q,
 	})
 
 	for {
 		select {
-		case <-q.quit: // * 监听退出信号
+		case <-q.quit: //  监听退出信号
 			slogx.Default.Info(context.Background(), "quitting producer")
 			return
-		default: // * 生产消息
+		default: //  生产消息
 			if v, ok := q.produceOne(producer); ok {
 				q.channel <- v //
 			}
@@ -171,7 +174,7 @@ func (q *Queue) startConsumers(count int) {
 func (q *Queue) consume(eventChan chan any) {
 	var consumer Consumer
 
-	// * 构建消费者直至成功
+	//  构建消费者直至成功
 	for {
 		var err error
 		if consumer, err = q.consumerFactory(); err != nil {
@@ -182,12 +185,12 @@ func (q *Queue) consume(eventChan chan any) {
 		}
 	}
 
-	// * 阻塞并竞争消费数据
+	//  阻塞并竞争消费数据
 	for {
 		select {
 		case message, ok := <-q.channel:
 			if ok {
-				q.consumeOne(consumer, message) // * 管道取出消息并消费
+				q.consumeOne(consumer, message) //  管道取出消息并消费
 			} else {
 				slogx.Default.Info(context.Background(), "Task channel was closed, quitting consumer...")
 				return
