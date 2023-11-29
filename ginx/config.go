@@ -1,6 +1,9 @@
 package ginx
 
-import "time"
+import (
+	"time"
+
+)
 
 type (
 	// A HttpConfig is a http config.
