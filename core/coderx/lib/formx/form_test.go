@@ -35,3 +35,29 @@ func TestEncode(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, "age=18&name=coderx", v.Encode())
 }
+
+func TestMarshal(t *testing.T) {
+	user := struct {
+		Name string `json:"name"`
+		Age  int    `json:"age"`
+	}{
+		Name: "coderx",
+		Age:  18,
+	}
+	formUrl := &FormUrl{}
+	v, err := formUrl.Marshal(&user)
+	assert.NoError(t, err)
+	assert.Equal(t, "age=18&name=coderx", string(v))
+}
+
+func TestUnmarshal(t *testing.T) {
+	user := struct {
+		Name string `json:"name"`
+		Age  int    `json:"age"`
+	}{}
+	formUrl := &FormUrl{}
+	err := formUrl.Unmarshal([]byte("age=18&name=coderx"), &user)
+	assert.NoError(t, err)
+	assert.Equal(t, "coderx", user.Name)
+	assert.Equal(t, 18, user.Age)
+}
