@@ -27,22 +27,9 @@ func Unmarshal(data []byte, v interface{}) error {
 }
 
 func NewDecoder(r io.Reader) marshaler.Decoder {
-	d := json.NewDecoder(r)
-	return &DecoderWrapper{
-		Decoder: d,
-		UnmarshalOptions: protojson.UnmarshalOptions{
-			DiscardUnknown: true,
-		},
-	}
+	return json.NewDecoder(r)
 }
 
 func NewEncoder(w io.Writer) marshaler.Encoder {
-	return marshaler.EncoderFunc(func(v interface{}) error {
-		uv, err := jsonpb.Marshal(v)
-		if err != nil {
-			return err
-		}
-		_, err = w.Write([]byte(uv))
-		return err
-	})
+	return jsonpb.NewEncoder(w)
 }

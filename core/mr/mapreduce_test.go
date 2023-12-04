@@ -26,11 +26,11 @@ func TestFinish(t *testing.T) {
 
 	var total uint32
 	err := Finish(func() error {
-		t.Log(2)
+		t.Log(1)
 		atomic.AddUint32(&total, 2)
 		return nil
 	}, func() error {
-		t.Log(3)
+		t.Log(2)
 		atomic.AddUint32(&total, 3)
 		return nil
 	}, func() error {
@@ -78,10 +78,13 @@ func TestFinishVoid(t *testing.T) {
 
 	var total uint32
 	FinishVoid(func() {
+		t.Log(1)
 		atomic.AddUint32(&total, 2)
 	}, func() {
+		t.Log(2)
 		atomic.AddUint32(&total, 3)
 	}, func() {
+		t.Log(3)
 		atomic.AddUint32(&total, 5)
 	})
 

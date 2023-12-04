@@ -11,6 +11,7 @@
     "protoc": {
         "path": "/home/linuxbrew/.linuxbrew/bin/protoc",
         "options": [
+            "--proto_path=/home/lyld/go/bin/include",
             "--proto_path=${workspaceFolder}/.build/proto",
             "--proto_path=${workspaceFolder}"
         ]

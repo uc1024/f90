@@ -10,6 +10,7 @@ require (
 	github.com/go-playground/universal-translator v0.18.1
 	github.com/go-playground/validator/v10 v10.14.1
 	github.com/golang-jwt/jwt/v4 v4.5.0
+	github.com/google/go-cmp v0.5.9
 	github.com/redis/go-redis/v9 v9.0.5
 	github.com/samber/lo v1.38.1
 	github.com/shopspring/decimal v1.3.1

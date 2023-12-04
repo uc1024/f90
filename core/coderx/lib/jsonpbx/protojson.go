@@ -8,6 +8,7 @@ import (
 	"reflect"
 	"strconv"
 
+	"github.com/uc1024/f90/core/coderx/marshaler"
 	"github.com/uc1024/f90/core/coderx/util"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
@@ -167,6 +168,24 @@ func (j *JSONPb) Unmarshal(data []byte, v interface{}) error {
 	return unmarshalJSONPb(data, j.UnmarshalOptions, v)
 }
 
+func (j *JSONPb) NewDecoder(r io.Reader) marshaler.Decoder {
+	d := json.NewDecoder(r)
+	return &DecoderWrapper{
+		Decoder:          d,
+		UnmarshalOptions: j.UnmarshalOptions,
+	}
+}
+
+func (j *JSONPb) NewEncoder(w io.Writer) marshaler.Encoder {
+	return marshaler.EncoderFunc(func(v interface{}) error {
+		uv, err := j.Marshal(v)
+		if err != nil {
+			return err
+		}
+		_, err = w.Write([]byte(uv))
+		return err
+	})
+}
 
 // DecoderWrapper is a wrapper around a *json.Decoder that adds
 // support for protos to the Decode method.
