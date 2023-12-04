@@ -2,7 +2,6 @@ package util
 
 import (
 	"encoding/base64"
-	"encoding/json"
 	"fmt"
 	"strconv"
 	"strings"
@@ -316,43 +315,4 @@ func UInt64Value(val string) (*wrapperspb.UInt64Value, error) {
 func BytesValue(val string) (*wrapperspb.BytesValue, error) {
 	parsedVal, err := Bytes(val)
 	return wrapperspb.Bytes(parsedVal), err
-}
-
-// ------------
-func convertKeyToString(in map[any]any) map[string]any {
-	res := make(map[string]any)
-	for k, v := range in {
-		res[Repr(k)] = toStringKeyMap(v)
-	}
-	return res
-}
-
-// convertSlice processes slice items to ensure key compatibility.
-func convertSlice(in []any) []any {
-	res := make([]any, len(in))
-	for i, v := range in {
-		res[i] = toStringKeyMap(v)
-	}
-	return res
-}
-
-// toStringKeyMap processes the data to ensure that all map keys are of type string.
-func toStringKeyMap(v any) any {
-	switch v := v.(type) {
-	case []any:
-		return convertSlice(v)
-	case map[any]any:
-		return convertKeyToString(v)
-	case bool, string:
-		return v
-	case int, uint, int8, uint8, int16, uint16, int32, uint32, int64, uint64, float32, float64:
-		return convertNumberToJsonNumber(v)
-	default:
-		return Repr(v)
-	}
-}
-
-// convertNumberToJsonNumber converts numbers into json.Number type for compatibility.
-func convertNumberToJsonNumber(in any) json.Number {
-	return json.Number(Repr(in))
 }

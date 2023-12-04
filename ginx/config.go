@@ -32,7 +32,7 @@ type (
 func DefaultHttpConfig() *HttpConfig {
 	conf := &HttpConfig{
 		Host:         "127.0.0.1",
-		Port:         10101,
+		Port:         10122,
 		Mode:         "release",
 		WriteTimeout: 10 * time.Second,
 		ReadTimeout:  10 * time.Second,

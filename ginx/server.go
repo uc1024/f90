@@ -22,8 +22,8 @@ func NewServer(sets ...setConfigOpt) *Server {
 	srv := &Server{
 		engine: gin.New(),
 		conf:   DefaultHttpConfig()}
-	each := func(each setConfigOpt, i int) { each(srv.conf) }
-	lo.ForEach(sets, each)
+	eachFunc := func(each setConfigOpt, i int) { each(srv.conf) }
+	lo.ForEach(sets, eachFunc)
 	srv.http = &http.Server{
 		Addr:         fmt.Sprintf("%s:%d", srv.conf.Host, srv.conf.Port),
 		Handler:      srv.engine,
