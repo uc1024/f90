@@ -10,10 +10,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
-	"github.com/uc1024/f90/core/coderx/lib/formx"
-	"github.com/uc1024/f90/core/coderx/lib/jsonpbx"
 	"github.com/uc1024/f90/core/proc"
 	"github.com/uc1024/f90/core/syncx"
+	"go.opentelemetry.io/otel/trace"
 )
 
 // Path: ginx/engine_test.go
@@ -29,23 +28,23 @@ func TestNewServer(t *testing.T) {
 
 func TestNewServerTest(t *testing.T) {
 	srv := NewServer()
-	srv.engine.PATCH("/test/:id", func(c *gin.Context) {
-		t.Log(c.Params) // 路由 /test/:id
+	srv.Engine.PATCH("/test/:id", func(c *gin.Context) {
+		span := trace.SpanFromContext(c.Request.Context())
+		// 获取TraceID
+		traceID := span.SpanContext().TraceID()
+		// 将TraceID转换为字符串并打印
+		traceIDStr := traceID.String()
+		t.Logf("TraceID: %s\n", traceIDStr)
 		user := &struct {
-			Id   int    `json:"id"`
-			Name string `json:"name"`
+			Id   int    `uri:"id" `
+			Name string `form:"name"`
 			Age  int    `json:"age"`
 		}{}
-		u := url.Values{}
-		for _, v := range c.Params {
-			u.Set(v.Key, v.Value)
-		}
-		err := formx.Unmarshal([]byte(u.Encode()), user)
+		err := c.BindUri(user)
 		assert.NoError(t, err)
-		uri := c.Request.URL.Query().Encode() // name=coderx
-		err = formx.Unmarshal([]byte(uri), user)
+		err = c.BindQuery(user)
 		assert.NoError(t, err)
-		err = jsonpbx.NewDecoder(c.Copy().Request.Body).Decode(user)
+		err = c.Bind(user)
 		assert.NoError(t, err)
 		t.Log(user)
 		c.JSON(200, gin.H{

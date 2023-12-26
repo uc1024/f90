@@ -9,7 +9,8 @@
         }
     },
     "protoc": {
-        "path": "/home/linuxbrew/.linuxbrew/bin/protoc",
+        // "path": "/home/linuxbrew/.linuxbrew/bin/protoc",
+        "path": "/home/lyld/go/bin/protoc",
         "options": [
             "--proto_path=/home/lyld/go/bin/include",
             "--proto_path=${workspaceFolder}/.build/proto",

@@ -27,8 +27,9 @@ type methodDesc struct {
 	Name    string // 方法名
 	Num     int    // 方法号
 	Request string // 请求结构
-	Reply   string // 回复结构
-	Comment string // 方法注释
+	// Reply   string // 回复结构
+	Response string // 回复结构
+	Comment  string // 方法注释
 	// http_rule
 	Path         string // 路径
 	Method       string // 方法
@@ -85,94 +86,66 @@ func executeServiceDesc(g *protogen.GeneratedFile, s *serviceDesc) error {
 		g.P("func ", serverHandlerMethodName(s.ServiceType, m), "(srv ", s.ServiceType, "HTTPServer", ") ", g.QualifiedGoIdent(ginPackage.Ident("HandlerFunc")), " {")
 		{ // gin.HandleFunc closure
 			g.P("return func(c *", g.QualifiedGoIdent(ginPackage.Ident("Context")), ") {")
-			g.P("carrier := ", g.QualifiedGoIdent(transportHttpPackage.Ident("FromCarrier")), "(c.Request.Context())")
-			if s.UseEncoding && m.HasVars {
-				g.P("c.Request = carrier.WithValueUri(c.Request, c.Params)")
-			}
-			{ // binding
-				g.P("shouldBind := func(req *", m.Request, ") error {")
-				if s.UseEncoding {
-					if m.HasBody {
-						g.P("if err := carrier.Bind(c, req", m.Body, "); err != nil {")
-						g.P("return err")
-						g.P("}")
-						if m.Body != "" {
-							g.P("if err := carrier.BindQuery(c, req); err != nil {")
-							g.P("return err")
-							g.P("}")
-						}
-					} else {
-						if m.Method != "PATCH" {
-							g.P("if err := carrier.BindQuery(c, req", m.Body, "); err != nil {")
-							g.P("return err")
-							g.P("}")
-						}
-					}
-					if m.HasVars {
-						g.P("if err := carrier.BindUri(c, req); err != nil {")
-						g.P("return err")
-						g.P("}")
-					}
-				} else {
-					if m.HasBody {
-						g.P("if err := c.ShouldBind(req", m.Body, "); err != nil {")
-						g.P("return err")
-						g.P("}")
-						if m.Body != "" {
-							g.P("if err := c.ShouldBindQuery(req); err != nil {")
-							g.P("return err")
-							g.P("}")
-						}
-					} else {
-						if m.Method != "PATCH" {
-							g.P("if err := c.ShouldBindQuery(req", m.Body, "); err != nil {")
-							g.P("return err")
-							g.P("}")
-						}
-					}
-					if m.HasVars {
-						g.P("if err := c.ShouldBindUri(req); err != nil {")
-						g.P("return err")
-						g.P("}")
-					}
-				}
-				g.P("return carrier.Validate(c.Request.Context(), req)")
-				g.P("}")
-			}
-			g.P()
-			{ // done
+			if m.HasVars {
 				g.P("var err error")
 				g.P("var req ", m.Request)
 				if s.RpcMode == "rpcx" {
-					g.P("var reply *", m.Reply, "= new(", m.Reply, ")")
+					g.P("var resp *", m.Response, "= new(", m.Response, ")")
 				} else {
-					g.P("var reply *", m.Reply)
+					g.P("var resp *", m.Response)
 				}
 				g.P()
-				g.P("if err = shouldBind(&req); err != nil {")
-				if args.DisableErrorBadRequest {
-					g.P("carrier.Error(c, err)")
-				} else {
-					g.P("carrier.ErrorBadRequest(c, err)")
-				}
-				g.P("return")
-				g.P("}")
-				if s.RpcMode == "rpcx" {
-					g.P("err = srv.", m.Name, "(c.Request.Context(), &req, reply)")
-				} else {
-					g.P("reply, err = srv.", m.Name, "(c.Request.Context(), &req)")
-				}
-				g.P("if err != nil {")
-				g.P("carrier.Error(c, err)")
-				g.P("return")
-				g.P("}")
-				g.P("carrier.Render(c, reply", m.ResponseBody, ")")
 			}
+			{
+				// binding
+				g.P("shouldBind := func(req *", m.Request, ") error {")
+				if m.HasBody {
+					g.P("if err :=", g.QualifiedGoIdent(ginxPackage.Ident("Bind")), "(c, req", m.Body, "); err != nil {")
+					g.P("return err")
+					g.P("}")
+					if m.Body != "" {
+						g.P("if err :=", g.QualifiedGoIdent(ginxPackage.Ident("BindQuery")), "(c, req); err != nil {")
+						g.P("return err")
+						g.P("}")
+					}
+				} else {
+					if m.Method != "PATCH" {
+						g.P("if err :=", g.QualifiedGoIdent(ginxPackage.Ident("BindQuery")), "(c,", m.Body, "); err != nil {")
+						g.P("return err")
+						g.P("}")
+					}
+				}
+				if m.HasVars {
+					g.P("if err :=", g.QualifiedGoIdent(ginxPackage.Ident("BindUri")), "(c, req); err != nil {")
+					g.P("return err")
+					g.P("}")
+				}
+			}
+			g.P("return ", g.QualifiedGoIdent(ginxPackage.Ident("Validate")), "().StructCtx",
+				"(c.Request.Context(),req)")
 			g.P("}")
 		}
-		g.P("}")
 		g.P()
+		{
+			g.P("if err = shouldBind(&req);err != nil {")
+			g.P("c.Error(err)")
+			g.P("c.Abort()")
+			g.P("}")
+			if s.RpcMode == "rpcx" {
+				g.P("err = srv.", m.Name, "(c.Request.Context(), &req, reply)")
+			} else {
+				g.P("resp, err = srv.", m.Name, "(c.Request.Context(), &req)")
+			}
+			g.P("if err != nil {")
+			g.P("c.Error(err)")
+			g.P("c.Abort()")
+			g.P("}")
+			g.P("c.JSON(", g.QualifiedGoIdent(netHttpPackage.Ident("StatusOK")), ",resp)")
+		}
+		g.P("}")
 	}
+	g.P("}")
+	g.P()
 
 	return nil
 }
@@ -182,11 +155,11 @@ func serverInterfaceName(serverType string) string {
 }
 
 func serverMethodNameForRpcx(g *protogen.GeneratedFile, m *methodDesc) string {
-	return m.Name + "(" + g.QualifiedGoIdent(contextPackage.Ident("Context")) + ", *" + m.Request + ", *" + m.Reply + ")" + "error"
+	return m.Name + "(" + g.QualifiedGoIdent(contextPackage.Ident("Context")) + ", *" + m.Request + ", *" + m.Response + ")" + "error"
 }
 
 func serverMethodName(g *protogen.GeneratedFile, m *methodDesc) string {
-	return m.Name + "(" + g.QualifiedGoIdent(contextPackage.Ident("Context")) + ", *" + m.Request + ") (*" + m.Reply + ", error)"
+	return m.Name + "(" + g.QualifiedGoIdent(contextPackage.Ident("Context")) + ", *" + m.Request + ") (*" + m.Response + ", error)"
 }
 
 func serverHandlerMethodName(serverType string, m *methodDesc) string {

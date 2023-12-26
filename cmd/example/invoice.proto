@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package f90.example.invoice;
+option go_package = "f90/cmd/example/invoice";
+
+// import "google/protobuf/empty.proto";
+import "google/api/annotations.proto";
+// import "google/api/field_behavior.proto";
+
+service Invoice {
+
+  rpc TestPath(TestPathRequest) returns (TestPathResponse) {
+    option (google.api.http) = {
+      patch : "/v1/invoice/{id}",
+      body : "*"
+    };
+  }
+}
+
+message TestPathRequest { string id = 1; }
+message TestPathResponse { string id = 1; }

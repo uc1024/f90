@@ -17,11 +17,13 @@ import (
 const deprecationComment = "// Deprecated: Do not use."
 
 var (
-	errorsPackage        = protogen.GoImportPath("errors")
-	contextPackage       = protogen.GoImportPath("context")
-	ginPackage           = protogen.GoImportPath("github.com/gin-gonic/gin")
-	netHttpPackage       = protogen.GoImportPath("net/http")
-	transportHttpPackage = protogen.GoImportPath("github.com/zmicro-team/zmicro/core/transport/http")
+	errorsPackage  = protogen.GoImportPath("errors")
+	contextPackage = protogen.GoImportPath("context")
+	netHttpPackage  = protogen.GoImportPath("net/http")
+	ginxPackage  = protogen.GoImportPath("github.com/uc1024/f90/ginx")
+	ginPackage     = protogen.GoImportPath("github.com/gin-gonic/gin")
+	// netHttpPackage       = protogen.GoImportPath("net/http")
+	// transportHttpPackage = protogen.GoImportPath("github.com/zmicro-team/zmicro/core/transport/http")
 )
 
 var methodSets = make(map[string]int)
@@ -268,7 +270,7 @@ func buildMethodDesc(g *protogen.GeneratedFile, m *protogen.Method, method, path
 		Name:       m.GoName,
 		Num:        methodSets[m.GoName],
 		Request:    g.QualifiedGoIdent(m.Input.GoIdent),
-		Reply:      g.QualifiedGoIdent(m.Output.GoIdent),
+		Response:   g.QualifiedGoIdent(m.Output.GoIdent),
 		Path:       transformPathParams(path),
 		Method:     method,
 		Comment:    comment,

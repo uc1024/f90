@@ -109,11 +109,11 @@ func newClientStruct(serverType string) string {
 }
 
 func clientMethodName(g *protogen.GeneratedFile, m *methodDesc) string {
-	return m.Name + "(" + g.QualifiedGoIdent(contextPackage.Ident("Context")) + ", *" + m.Request + ") (*" + m.Reply + ", error)"
+	return m.Name + "(" + g.QualifiedGoIdent(contextPackage.Ident("Context")) + ", *" + m.Request + ") (*" + m.Response + ", error)"
 }
 
 func clientMethodNameForRpcx(g *protogen.GeneratedFile, m *methodDesc) string {
-	return m.Name + "(" + g.QualifiedGoIdent(contextPackage.Ident("Context")) + ", *" + m.Request + ", *" + m.Reply + ")" + "error"
+	return m.Name + "(" + g.QualifiedGoIdent(contextPackage.Ident("Context")) + ", *" + m.Request + ", *" + m.Response + ")" + "error"
 }
 
 func clientMethod(g *protogen.GeneratedFile, m *methodDesc, serverType string) string {
@@ -129,7 +129,7 @@ func clientMethod(g *protogen.GeneratedFile, m *methodDesc, serverType string) s
 	result.WriteString(fmt.Sprintf("req *%s ", m.Request))
 	result.WriteString(") ")
 	result.WriteString("(reply *")
-	result.WriteString(m.Reply)
+	result.WriteString(m.Response)
 	result.WriteString(", ")
 	result.WriteString("err error ")
 	result.WriteString(") ")
@@ -155,7 +155,7 @@ func clientMethodForRpcx(g *protogen.GeneratedFile, m *methodDesc, serverType st
 	result.WriteString(g.QualifiedGoIdent(contextPackage.Ident("Context")))
 	result.WriteString(", ")
 	result.WriteString(fmt.Sprintf("req *%s, ", m.Request))
-	result.WriteString(fmt.Sprintf("reply *%s ", m.Reply))
+	result.WriteString(fmt.Sprintf("reply *%s ", m.Response))
 	result.WriteString(") ")
 	result.WriteString("(err error) ")
 	result.WriteString(" {" + "\n")
